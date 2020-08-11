@@ -5,7 +5,7 @@
     'description': "This module have centralised all activity in one view 'Calendar' with important filter.",
     "category": "Calendar",
     "version": "13.0.0.0",
-    'author': '',
+    'author': 'b.v.softech@gmail.com',
     'website': '',
     'license': 'OPL-1',
     'support': 'b.a.softech@gmail.com',
