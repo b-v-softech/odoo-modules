@@ -1,0 +1,99 @@
+<?xml version="1.0"?>
+<odoo>
+    <data>
+        
+        <!-- Activity Tree Views  -->
+        <record id="calendar_mail_activity_tree_view" model="ir.ui.view">
+            <field name="name">calendar.mail.activity.tree.view</field>
+            <field name="model">mail.activity</field>
+            <field name="arch" type="xml">
+                <tree string="Activities" create="0">
+                    <field name="activity_type_id"/>
+                    <field name="res_name"/>
+                    <field name="date_deadline" string="Date"/>
+                    <field name="user_id"/>
+                    <field name="summary"/>
+                    <field name="create_date" invisible="1"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Search View -->
+        <record id="calendar_mail_activity_search_view" model="ir.ui.view">
+            <field name="name">calendar.mail.activity.search.view</field>
+            <field name="model">mail.activity</field>
+            <field name="arch" type="xml">
+                <search string="Search Activities">
+                    <field name="activity_type_id"/>
+                    <field name="summary"/>
+                    <field name="date_deadline" string="Date"/>
+                    <field name="user_id" string="Attached to"/>
+                    <filter string="My Activities" name="my_activities"
+                        domain="[('user_id', '=', uid)]"/>
+                    <filter name="overdue" string="Overdue" domain="[('date_deadline', '&lt;', context_today().strftime('%Y-%m-%d'))]"/>
+                    <filter name="in_future" string="In Future" domain="[('date_deadline', '&gt;=', context_today().strftime('%Y-%m-%d'))]"/>
+                    <group expand="0" string="Group By">
+                        <filter name="group_by_user" string="Users" domain="[]" context="{'group_by':'user_id'}"/>
+                        <filter name="group_by_date" string="Date Deadline" domain="[]" context="{'group_by':'date_deadline'}"/>
+                        <filter name="group_by_type" string="Activity Type" domain="[]" context="{'group_by':'activity_type_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- View -->
+        <record id="calendar_mail_activity_form_view" model="ir.ui.view">
+            <field name="name">calendar.mail.activity.form.view</field>
+            <field name="model">mail.activity</field>
+            <field name="inherit_id" ref="mail.mail_activity_view_form_popup"/>
+            <field name="arch" type="xml">
+                <field name="user_id" position="after">
+                    <field name="res_rec_url" widget="url" attrs="{'invisible':['|',('res_id','=',False),('res_model','=',False)]}" text="Related Record"/>
+                </field>
+            </field>
+        </record>
+
+        <record id="calendar_mail_activity_calender_view" model="ir.ui.view">
+            <field name="name">calendar.mail.activity.calendar.view</field>
+            <field name="model">mail.activity</field>
+            <field name="priority" eval="10"/>
+            <field name="arch" type="xml">
+                <calendar string="Activity" date_start="date_deadline" color="activity_type_id">
+                    <field name="res_name"/>
+                    <field name="summary"/>
+                </calendar>
+            </field>
+        </record>
+        
+        <record id="calendar_mail_activity_action" model="ir.actions.act_window">
+            <field name="name">Activities</field>
+            <field name="res_model">mail.activity</field>
+            <field name="view_mode">tree,calendar,form</field>
+            <field name="search_view_id" ref="calendar_mail_activity_search_view"/>
+            <field name="context">{'search_default_my_activities': 1,}</field>
+        </record>
+
+        <record id="calendar_mail_activity_action_form" model="ir.actions.act_window.view">
+            <field eval="1" name="sequence"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="calendar_mail_activity_tree_view"/>
+            <field name="act_window_id" ref="calendar_mail_activity_action"/>
+        </record>
+        <record id="calendar_mail_activity_action_calendar" model="ir.actions.act_window.view">
+            <field eval="2" name="sequence"/>
+            <field name="view_mode">calendar</field>
+            <field name="view_id" ref="calendar_mail_activity_calender_view"/>
+            <field name="act_window_id" ref="calendar_mail_activity_action"/>
+        </record>
+        <record id="calendar_mail_activity_action_form" model="ir.actions.act_window.view">
+            <field eval="3" name="sequence"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="calendar_mail_activity_form_view"/>
+            <field name="act_window_id" ref="calendar_mail_activity_action"/>
+        </record>
+        
+        <menuitem name="Meetings" id="menu_activity_calender_meetings" parent="calendar.mail_menu_calendar" sequence="1" action="calendar.action_calendar_event"/>
+
+        <menuitem name="Activities" id="menu_calender_activity_activities" parent="calendar.mail_menu_calendar" sequence="10" action="calendar_mail_activity_action"/>
+    </data>
+</odoo>
